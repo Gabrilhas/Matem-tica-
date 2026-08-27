@@ -41,14 +41,14 @@ export const NumericKeypad: React.FC<NumericKeypadProps> = ({
   const keyBase =
     'relative flex items-center justify-center font-math font-medium rounded-2xl transition-all duration-150 select-none backdrop-blur-md shadow-sm active:scale-95 touch-manipulation disabled:opacity-30 disabled:pointer-events-none cursor-pointer';
 
-  const digitClass = `${keyBase} h-14 sm:h-15 text-2xl sm:text-3xl bg-white/5 hover:bg-white/15 active:bg-white/25 border border-white/10 active:border-white/30 text-white shadow-[0_4px_12px_rgba(0,0,0,0.15)]`;
+  const digitClass = `${keyBase} h-12 sm:h-14 text-2xl sm:text-3xl bg-white/5 hover:bg-white/15 active:bg-white/25 border border-white/10 active:border-white/30 text-white shadow-[0_4px_12px_rgba(0,0,0,0.15)]`;
 
-  const utilClass = `${keyBase} h-14 sm:h-15 text-lg bg-white/5 hover:bg-white/10 active:bg-white/20 border border-white/10 text-white/70 hover:text-white active:border-white/20`;
+  const utilClass = `${keyBase} h-12 sm:h-14 text-lg bg-white/5 hover:bg-white/10 active:bg-white/20 border border-white/10 text-white/70 hover:text-white active:border-white/20`;
 
   return (
-    <div className="w-full max-w-sm mx-auto px-4 pb-3 pt-1">
+    <div className="w-full max-w-sm mx-auto px-4 pt-1 pb-7 sm:pb-4 mb-[env(safe-area-inset-bottom,0px)]">
       {/* 4x3 Grid */}
-      <div className="grid grid-cols-3 gap-2 sm:gap-2.5">
+      <div className="grid grid-cols-3 gap-1.5 sm:gap-2.5">
         {/* Row 1: 1, 2, 3 */}
         {[1, 2, 3].map((num) => (
           <button
@@ -118,7 +118,7 @@ export const NumericKeypad: React.FC<NumericKeypadProps> = ({
           type="button"
           disabled={disabled}
           onClick={() => handlePress(onDelete, 'delete')}
-          className={`${keyBase} h-14 sm:h-15 text-rose-300 bg-rose-500/10 hover:bg-rose-500/20 active:bg-rose-500/30 border border-rose-400/20 hover:border-rose-400/40`}
+          className={`${keyBase} h-12 sm:h-14 text-rose-300 bg-rose-500/10 hover:bg-rose-500/20 active:bg-rose-500/30 border border-rose-400/20 hover:border-rose-400/40`}
           title="Apagar dígito"
         >
           <Delete className="w-5 h-5" />
@@ -126,13 +126,13 @@ export const NumericKeypad: React.FC<NumericKeypadProps> = ({
       </div>
 
       {/* Row 5: Action bar (Clear & Submit) */}
-      <div className="grid grid-cols-4 gap-2 sm:gap-2.5 mt-2 sm:mt-2.5">
+      <div className="grid grid-cols-4 gap-1.5 sm:gap-2.5 mt-1.5 sm:mt-2.5">
         <button
           id="keypad-clear"
           type="button"
           disabled={disabled}
           onClick={() => handlePress(onClear, 'delete')}
-          className={`${keyBase} col-span-1 h-12 text-xs font-semibold tracking-wider uppercase text-white/60 bg-white/5 hover:bg-white/10 hover:text-white border border-white/10`}
+          className={`${keyBase} col-span-1 h-11 sm:h-12 text-xs font-semibold tracking-wider uppercase text-white/60 bg-white/5 hover:bg-white/10 hover:text-white border border-white/10`}
           title="Limpar tudo"
         >
           <RotateCcw className="w-4 h-4 mr-1" />
@@ -144,7 +144,7 @@ export const NumericKeypad: React.FC<NumericKeypadProps> = ({
           type="button"
           disabled={disabled || !canSubmit}
           onClick={() => handlePress(onSubmit, 'submit')}
-          className={`${keyBase} col-span-3 h-12 text-sm font-bold tracking-wider uppercase bg-emerald-400 hover:bg-emerald-300 text-slate-950 border-none shadow-[0_0_20px_rgba(52,211,153,0.35)] hover:shadow-[0_0_25px_rgba(52,211,153,0.5)] active:scale-[0.98] transition-all disabled:bg-white/5 disabled:text-white/30 disabled:shadow-none disabled:border disabled:border-white/10`}
+          className={`${keyBase} col-span-3 h-11 sm:h-12 text-sm font-bold tracking-wider uppercase bg-emerald-400 hover:bg-emerald-300 text-slate-950 border-none shadow-[0_0_20px_rgba(52,211,153,0.35)] hover:shadow-[0_0_25px_rgba(52,211,153,0.5)] active:scale-[0.98] transition-all disabled:bg-white/5 disabled:text-white/30 disabled:shadow-none disabled:border disabled:border-white/10`}
         >
           <span className="flex items-center justify-center gap-2">
             Confirmar

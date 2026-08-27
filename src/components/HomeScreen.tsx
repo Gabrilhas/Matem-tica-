@@ -53,7 +53,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
   ];
 
   return (
-    <div className="flex-1 flex flex-col justify-between p-5 max-w-sm mx-auto w-full text-white">
+    <div className="flex-1 flex flex-col justify-between p-5 pb-8 sm:pb-5 max-w-sm mx-auto w-full text-white overflow-y-auto">
       {/* Top Brand & Actions */}
       <div>
         <div className="flex items-center justify-between mb-4">

@@ -42,7 +42,7 @@ export const PhoneContainer: React.FC<PhoneContainerProps> = ({
         className={`w-full transition-all duration-300 flex flex-col z-20 ${
           showFrame
             ? 'max-w-[450px] h-[92vh] max-h-[860px] bg-white/10 backdrop-blur-2xl rounded-[40px] border border-white/20 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.7)] relative overflow-hidden'
-            : 'max-w-[450px] min-h-screen sm:min-h-[760px] sm:max-h-[92vh] bg-white/10 backdrop-blur-2xl sm:rounded-[40px] sm:border sm:border-white/20 shadow-2xl relative overflow-hidden'
+            : 'max-w-[450px] h-[100dvh] sm:h-auto sm:min-h-[760px] sm:max-h-[92vh] bg-slate-950 sm:bg-white/10 backdrop-blur-2xl sm:rounded-[40px] sm:border sm:border-white/20 shadow-2xl relative overflow-hidden'
         }`}
       >
         {/* Phone Notch/Speaker simulation */}
@@ -56,14 +56,16 @@ export const PhoneContainer: React.FC<PhoneContainerProps> = ({
         )}
 
         {/* Content Area */}
-        <div className="flex-1 flex flex-col overflow-hidden relative">
+        <div className="flex-1 flex flex-col overflow-hidden relative h-full">
           {children}
         </div>
 
-        {/* Phone Home Bar simulation */}
-        <div className="w-full flex items-center justify-center pb-2.5 pt-1 z-30 shrink-0 select-none">
-          <div className="w-32 h-1 bg-white/20 rounded-full" />
-        </div>
+        {/* Phone Home Bar simulation (only in desktop frame mode) */}
+        {showFrame && (
+          <div className="w-full flex items-center justify-center pb-2.5 pt-1 z-30 shrink-0 select-none">
+            <div className="w-32 h-1 bg-white/20 rounded-full" />
+          </div>
+        )}
       </div>
     </div>
   );

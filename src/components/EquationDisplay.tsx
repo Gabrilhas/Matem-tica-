@@ -39,9 +39,9 @@ export const EquationDisplay: React.FC<EquationDisplayProps> = ({
   const hasQuestionMark = equation.display.includes('?');
 
   return (
-    <div className="relative flex-1 flex flex-col items-center justify-center px-4 py-3 min-h-[190px]">
+    <div className="relative flex-1 flex flex-col items-center justify-center px-4 py-2 sm:py-3 min-h-[140px] sm:min-h-[180px]">
       {/* Operator Badge & Streak Multiplier */}
-      <div className="flex items-center gap-2 mb-3">
+      <div className="flex items-center gap-2 mb-2 sm:mb-3">
         <span
           className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border ${opInfo.color} bg-white/5 backdrop-blur-md shadow-sm`}
         >
@@ -69,7 +69,7 @@ export const EquationDisplay: React.FC<EquationDisplayProps> = ({
       {/* Main Frosted Equation Box */}
       <motion.div
         key={equation.id}
-        initial={{ opacity: 0, y: 12, scale: 0.96 }}
+        initial={{ opacity: 0, y: 10, scale: 0.97 }}
         animate={{
           opacity: 1,
           y: 0,
@@ -77,7 +77,7 @@ export const EquationDisplay: React.FC<EquationDisplayProps> = ({
           x: isCorrectFeedback === false ? [-6, 6, -4, 4, 0] : 0,
         }}
         transition={{ duration: 0.25 }}
-        className={`w-full max-w-sm rounded-3xl p-5 sm:p-6 text-center border transition-all duration-200 relative overflow-hidden backdrop-blur-2xl shadow-xl ${
+        className={`w-full max-w-sm rounded-3xl p-4 sm:p-6 text-center border transition-all duration-200 relative overflow-hidden backdrop-blur-2xl shadow-xl ${
           isCorrectFeedback === true
             ? 'bg-emerald-500/15 border-emerald-400/60 shadow-[0_0_30px_rgba(52,211,153,0.25)]'
             : isCorrectFeedback === false

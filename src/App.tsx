@@ -30,6 +30,7 @@ import { SettingsModal } from './components/SettingsModal';
 import { StatsModal } from './components/StatsModal';
 import { PauseModal } from './components/PauseModal';
 import { LevelUpOverlay } from './components/LevelUpOverlay';
+import { CountdownOverlay } from './components/CountdownOverlay';
 
 export default function App() {
   // Persistence state
@@ -43,6 +44,8 @@ export default function App() {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isStatsOpen, setIsStatsOpen] = useState(false);
   const [levelUpNewLevel, setLevelUpNewLevel] = useState<number | null>(null);
+  const [isCountdownActive, setIsCountdownActive] = useState(false);
+  const [countdownLevel, setCountdownLevel] = useState<number | null>(null);
 
   // Gameplay state
   const [level, setLevel] = useState(1);
@@ -123,6 +126,23 @@ export default function App() {
 
     setScreen('playing');
     spawnEquation(1);
+    setCountdownLevel(1);
+    setIsCountdownActive(true);
+  };
+
+  const handleDismissLevelUp = () => {
+    const nextLvl = levelUpNewLevel ?? level;
+    setLevelUpNewLevel(null);
+    spawnEquation(nextLvl);
+    setCountdownLevel(nextLvl);
+    setIsCountdownActive(true);
+  };
+
+  const handleCountdownComplete = () => {
+    setIsCountdownActive(false);
+    setCountdownLevel(null);
+    setIsProcessingAnswer(false);
+    lastTimeRef.current = Date.now();
   };
 
   // Handle Game Over
@@ -222,7 +242,13 @@ export default function App() {
 
   // Main Timer Loop
   useEffect(() => {
-    if (screen !== 'playing' || isPaused || isProcessingAnswer) {
+    if (
+      screen !== 'playing' ||
+      isPaused ||
+      isProcessingAnswer ||
+      isCountdownActive ||
+      levelUpNewLevel !== null
+    ) {
       if (timerRef.current) {
         clearInterval(timerRef.current);
         timerRef.current = null;
@@ -266,7 +292,16 @@ export default function App() {
         timerRef.current = null;
       }
     };
-  }, [screen, isPaused, isProcessingAnswer, gameMode, handleTimeout, triggerGameOver]);
+  }, [
+    screen,
+    isPaused,
+    isProcessingAnswer,
+    isCountdownActive,
+    levelUpNewLevel,
+    gameMode,
+    handleTimeout,
+    triggerGameOver,
+  ]);
 
   // Handle Digit Input
   const handleDigit = (digit: string) => {
@@ -375,16 +410,16 @@ export default function App() {
         if (gameMode === 'classic' && lives < maxLives) {
           setLives((prev) => Math.min(maxLives, prev + 1));
         }
+        // Note: Equation and countdown will spawn when LevelUpOverlay is dismissed
       } else {
         setXpInLevel(nextXp);
+        // Next equation after smooth reward animation
+        setTimeout(() => {
+          if (screen === 'playing') {
+            spawnEquation(nextLevel);
+          }
+        }, 550);
       }
-
-      // Next equation after smooth reward animation
-      setTimeout(() => {
-        if (screen === 'playing') {
-          spawnEquation(nextLevel);
-        }
-      }, 550);
     } else {
       setIsCorrectFeedback(false);
       setStreak(0);
@@ -416,7 +451,15 @@ export default function App() {
   // Keyboard shortcut listener (0-9, Backspace, Enter, Minus, Escape)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (screen !== 'playing' || isPaused) return;
+      if (
+        screen !== 'playing' ||
+        isPaused ||
+        isProcessingAnswer ||
+        isCountdownActive ||
+        levelUpNewLevel !== null
+      ) {
+        return;
+      }
 
       if (e.key >= '0' && e.key <= '9') {
         handleDigit(e.key);
@@ -484,7 +527,7 @@ export default function App() {
           <TimerBar
             timeLeft={timeLeft}
             totalTime={totalTime}
-            isRunning={!isPaused && !isProcessingAnswer}
+            isRunning={!isPaused && !isProcessingAnswer && !isCountdownActive && levelUpNewLevel === null}
             soundEnabled={settings.soundEnabled}
           />
 
@@ -504,7 +547,7 @@ export default function App() {
             onClear={handleClear}
             onToggleSign={handleToggleSign}
             onSubmit={handleSubmit}
-            disabled={isProcessingAnswer}
+            disabled={isProcessingAnswer || isCountdownActive || levelUpNewLevel !== null}
             canSubmit={userInput.trim() !== '' && userInput !== '-'}
             vibrationEnabled={settings.vibrationEnabled}
           />
@@ -526,11 +569,20 @@ export default function App() {
 
       {/* Modals & Overlays */}
       <AnimatePresence>
+        {/* Countdown Overlay (3, 2, 1, Calcule!) */}
+        {isCountdownActive && (
+          <CountdownOverlay
+            level={countdownLevel ?? undefined}
+            onComplete={handleCountdownComplete}
+            vibrationEnabled={settings.vibrationEnabled}
+          />
+        )}
+
         {/* Level Up Celebration Banner */}
         {levelUpNewLevel !== null && (
           <LevelUpOverlay
             newLevel={levelUpNewLevel}
-            onDismiss={() => setLevelUpNewLevel(null)}
+            onDismiss={handleDismissLevelUp}
           />
         )}
 
