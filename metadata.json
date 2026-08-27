@@ -1,6 +1,6 @@
 {
-  "name": "MathMaster - Desafio Matemático",
-  "description": "Aplicativo mobile de resolução de equações matemáticas com soma, subtração, multiplicação, divisão e raiz quadrada, níveis progressivos, timer e teclado numérico interativo.",
+  "name": "Matemática Básica",
+  "description": "Aplicativo de resolução de equações matemáticas com soma, subtração, multiplicação, divisão, potência e raiz quadrada, níveis progressivos, timer e teclado adaptativo.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

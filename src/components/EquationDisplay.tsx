@@ -39,16 +39,16 @@ export const EquationDisplay: React.FC<EquationDisplayProps> = ({
   const hasQuestionMark = equation.display.includes('?');
 
   return (
-    <div className="relative flex-1 flex flex-col items-center justify-center px-4 py-2 sm:py-3 min-h-[140px] sm:min-h-[180px]">
+    <div className="relative flex-1 flex flex-col items-center justify-center px-4 py-2 sm:py-3 md:py-8 min-h-[140px] sm:min-h-[180px] md:min-h-[220px]">
       {/* Operator Badge & Streak Multiplier */}
-      <div className="flex items-center gap-2 mb-2 sm:mb-3">
+      <div className="flex items-center gap-2 mb-2 sm:mb-3 md:mb-5">
         <span
-          className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border ${opInfo.color} bg-white/5 backdrop-blur-md shadow-sm`}
+          className={`inline-flex items-center gap-1.5 px-3 md:px-4 py-1 md:py-1.5 rounded-full text-xs md:text-sm font-semibold border ${opInfo.color} bg-white/5 backdrop-blur-md shadow-sm`}
         >
-          <span className="font-math font-bold text-sm">{opInfo.icon}</span>
+          <span className="font-math font-bold text-sm md:text-base">{opInfo.icon}</span>
           <span>{opInfo.label}</span>
           {equation.isAlgebraic && (
-            <span className="ml-1 px-1.5 py-0.5 bg-white/15 rounded text-[10px] uppercase font-mono tracking-wider text-white/90">
+            <span className="ml-1 px-1.5 py-0.5 bg-white/15 rounded text-[10px] md:text-xs uppercase font-mono tracking-wider text-white/90">
               Álgebra
             </span>
           )}
@@ -58,9 +58,9 @@ export const EquationDisplay: React.FC<EquationDisplayProps> = ({
           <motion.div
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            className="flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-amber-500/15 border border-amber-400/30 text-amber-300 backdrop-blur-md shadow-sm"
+            className="flex items-center gap-1 px-3 md:px-4 py-1 md:py-1.5 rounded-full text-xs md:text-sm font-bold bg-amber-500/15 border border-amber-400/30 text-amber-300 backdrop-blur-md shadow-sm"
           >
-            <Sparkles className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
+            <Sparkles className="w-3.5 h-3.5 md:w-4 md:h-4 text-amber-400 fill-amber-400" />
             <span>Combo {streak}x</span>
           </motion.div>
         )}
@@ -77,7 +77,7 @@ export const EquationDisplay: React.FC<EquationDisplayProps> = ({
           x: isCorrectFeedback === false ? [-6, 6, -4, 4, 0] : 0,
         }}
         transition={{ duration: 0.25 }}
-        className={`w-full max-w-sm rounded-3xl p-4 sm:p-6 text-center border transition-all duration-200 relative overflow-hidden backdrop-blur-2xl shadow-xl ${
+        className={`w-full max-w-sm md:max-w-md rounded-3xl md:rounded-[36px] p-4 sm:p-6 md:p-8 text-center border transition-all duration-200 relative overflow-hidden backdrop-blur-2xl shadow-xl ${
           isCorrectFeedback === true
             ? 'bg-emerald-500/15 border-emerald-400/60 shadow-[0_0_30px_rgba(52,211,153,0.25)]'
             : isCorrectFeedback === false
@@ -89,34 +89,34 @@ export const EquationDisplay: React.FC<EquationDisplayProps> = ({
         <div className="absolute -top-10 -right-10 w-32 h-32 bg-white/5 rounded-full blur-xl pointer-events-none" />
 
         {/* The Equation Expression */}
-        <div className="relative font-math text-3xl sm:text-4xl font-extrabold text-white tracking-tight leading-tight flex items-center justify-center flex-wrap gap-x-2 gap-y-1">
+        <div className="relative font-math text-3xl sm:text-4xl md:text-5xl font-extrabold text-white tracking-tight leading-tight flex items-center justify-center flex-wrap gap-x-3 gap-y-2">
           {hasQuestionMark ? (
             <>
               <span className="drop-shadow-sm">{equation.display.replace('?', '').trim()}</span>
-              <span className="inline-flex items-center justify-center min-w-[72px] px-3 py-1 bg-black/30 backdrop-blur-md border border-white/20 rounded-2xl transition-all shadow-inner relative text-emerald-300 font-math text-3xl sm:text-4xl">
+              <span className="inline-flex items-center justify-center min-w-[72px] md:min-w-[96px] px-3 md:px-5 py-1 md:py-2 bg-black/40 backdrop-blur-md border border-emerald-400/30 rounded-2xl md:rounded-3xl transition-all shadow-inner relative text-emerald-300 font-math text-3xl sm:text-4xl md:text-5xl">
                 {userInput ? (
                   <span className="font-bold text-white drop-shadow">{userInput}</span>
                 ) : (
                   <span className="text-white/30 font-normal animate-pulse">?</span>
                 )}
                 {/* Typing cursor */}
-                <span className="inline-block w-0.5 h-6 bg-emerald-400 ml-1 animate-pulse shadow-[0_0_8px_#34d399]" />
+                <span className="inline-block w-0.5 md:w-1 h-6 md:h-8 bg-emerald-400 ml-1 animate-pulse shadow-[0_0_8px_#34d399]" />
               </span>
             </>
           ) : (
             <>
               {/* For algebraic equations like "x + 9 = 24" */}
               <div className="w-full text-white mb-2 drop-shadow-sm">{equation.display}</div>
-              <div className="w-full flex items-center justify-center gap-2 text-xl sm:text-2xl text-white/90 font-sans font-semibold">
-                <span className="text-emerald-400 font-math font-bold italic text-3xl">x</span>
+              <div className="w-full flex items-center justify-center gap-2 text-xl sm:text-2xl md:text-3xl text-white/90 font-sans font-semibold">
+                <span className="text-emerald-400 font-math font-bold italic text-3xl md:text-4xl">x</span>
                 <span>=</span>
-                <span className="inline-flex items-center justify-center min-w-[72px] px-3 py-1 bg-black/30 backdrop-blur-md border border-white/20 rounded-2xl transition-all shadow-inner relative text-emerald-300 font-math text-3xl sm:text-4xl">
+                <span className="inline-flex items-center justify-center min-w-[72px] md:min-w-[96px] px-3 md:px-5 py-1 md:py-2 bg-black/40 backdrop-blur-md border border-emerald-400/30 rounded-2xl md:rounded-3xl transition-all shadow-inner relative text-emerald-300 font-math text-3xl sm:text-4xl md:text-5xl">
                   {userInput ? (
                     <span className="font-bold text-white drop-shadow">{userInput}</span>
                   ) : (
                     <span className="text-white/30 font-normal animate-pulse">?</span>
                   )}
-                  <span className="inline-block w-0.5 h-6 bg-emerald-400 ml-1 animate-pulse shadow-[0_0_8px_#34d399]" />
+                  <span className="inline-block w-0.5 md:w-1 h-6 md:h-8 bg-emerald-400 ml-1 animate-pulse shadow-[0_0_8px_#34d399]" />
                 </span>
               </div>
             </>

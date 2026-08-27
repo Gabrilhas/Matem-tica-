@@ -448,7 +448,7 @@ export default function App() {
     }
   };
 
-  // Keyboard shortcut listener (0-9, Backspace, Enter, Minus, Escape)
+  // Keyboard shortcut listener (0-9, Backspace, Enter, Minus, Escape, Delete, Space, C)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (
@@ -463,12 +463,15 @@ export default function App() {
 
       if (e.key >= '0' && e.key <= '9') {
         handleDigit(e.key);
-      } else if (e.key === 'Backspace') {
+      } else if (e.key === 'Backspace' || e.key === 'Delete') {
         handleDelete();
-      } else if (e.key === 'Enter') {
+      } else if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
         handleSubmit();
-      } else if (e.key === '-' || e.key === 'm') {
+      } else if (e.key === '-' || e.key === 'm' || e.key === 'M') {
         handleToggleSign();
+      } else if (e.key === 'c' || e.key === 'C') {
+        handleClear();
       } else if (e.key === 'Escape') {
         setIsPaused(true);
       }
@@ -540,17 +543,76 @@ export default function App() {
             showExplanation={isCorrectFeedback === false}
           />
 
-          {/* On-Screen Numeric Keypad (0-9, ±, Backspace, Clear, Confirm) */}
-          <NumericKeypad
-            onDigit={handleDigit}
-            onDelete={handleDelete}
-            onClear={handleClear}
-            onToggleSign={handleToggleSign}
-            onSubmit={handleSubmit}
-            disabled={isProcessingAnswer || isCountdownActive || levelUpNewLevel !== null}
-            canSubmit={userInput.trim() !== '' && userInput !== '-'}
-            vibrationEnabled={settings.vibrationEnabled}
-          />
+          {/* Mobile Only: On-Screen Numeric Keypad (0-9, ±, Backspace, Clear, Confirm) */}
+          <div className="md:hidden">
+            <NumericKeypad
+              onDigit={handleDigit}
+              onDelete={handleDelete}
+              onClear={handleClear}
+              onToggleSign={handleToggleSign}
+              onSubmit={handleSubmit}
+              disabled={isProcessingAnswer || isCountdownActive || levelUpNewLevel !== null}
+              canSubmit={userInput.trim() !== '' && userInput !== '-'}
+              vibrationEnabled={settings.vibrationEnabled}
+            />
+          </div>
+
+          {/* Desktop Version: Sleek Answer Control & Keyboard Shortcuts Helper */}
+          <div className="hidden md:flex flex-col items-center justify-center gap-3 px-6 pb-6 pt-2 select-none">
+            <div className="flex items-center gap-3">
+              <button
+                id="btn-desktop-clear"
+                type="button"
+                onClick={handleClear}
+                disabled={isProcessingAnswer || isCountdownActive || levelUpNewLevel !== null || !userInput}
+                className="px-4 py-2 rounded-2xl text-xs font-bold uppercase tracking-wider text-white/60 hover:text-white bg-white/5 hover:bg-white/10 active:bg-white/20 border border-white/10 transition-all disabled:opacity-30 disabled:pointer-events-none cursor-pointer"
+                title="Limpar resposta (Tecla C)"
+              >
+                Limpar (C)
+              </button>
+              <button
+                id="btn-desktop-sign"
+                type="button"
+                onClick={handleToggleSign}
+                disabled={isProcessingAnswer || isCountdownActive || levelUpNewLevel !== null}
+                className="px-4 py-2 rounded-2xl text-xs font-bold uppercase tracking-wider text-white/60 hover:text-white bg-white/5 hover:bg-white/10 active:bg-white/20 border border-white/10 transition-all disabled:opacity-30 disabled:pointer-events-none cursor-pointer"
+                title="Alternar sinal positivo/negativo (Tecla -)"
+              >
+                ± Sinal (-)
+              </button>
+              <button
+                id="btn-desktop-submit"
+                type="button"
+                onClick={handleSubmit}
+                disabled={
+                  isProcessingAnswer ||
+                  isCountdownActive ||
+                  levelUpNewLevel !== null ||
+                  userInput.trim() === '' ||
+                  userInput === '-'
+                }
+                className="px-7 py-2.5 rounded-2xl text-sm font-bold uppercase tracking-wider bg-emerald-400 hover:bg-emerald-300 active:scale-[0.98] text-slate-950 border-none shadow-[0_0_20px_rgba(52,211,153,0.35)] hover:shadow-[0_0_25px_rgba(52,211,153,0.5)] transition-all disabled:opacity-30 disabled:pointer-events-none disabled:shadow-none cursor-pointer"
+              >
+                Confirmar (Enter ↵)
+              </button>
+            </div>
+
+            {/* Visual keyboard shortcuts legend */}
+            <div className="flex items-center justify-center flex-wrap gap-2 text-[11px] text-white/50 pt-1">
+              <span className="inline-flex items-center gap-1 bg-white/5 px-2.5 py-0.5 rounded-lg border border-white/10 font-mono">
+                [0-9] Digitar
+              </span>
+              <span className="inline-flex items-center gap-1 bg-white/5 px-2.5 py-0.5 rounded-lg border border-white/10 font-mono text-emerald-400/90 font-semibold">
+                [Enter ↵] Confirmar
+              </span>
+              <span className="inline-flex items-center gap-1 bg-white/5 px-2.5 py-0.5 rounded-lg border border-white/10 font-mono">
+                [Backspace] Apagar
+              </span>
+              <span className="inline-flex items-center gap-1 bg-white/5 px-2.5 py-0.5 rounded-lg border border-white/10 font-mono">
+                [-] Sinal
+              </span>
+            </div>
+          </div>
         </div>
       )}
 

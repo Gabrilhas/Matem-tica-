@@ -42,7 +42,7 @@ export const PhoneContainer: React.FC<PhoneContainerProps> = ({
         className={`w-full transition-all duration-300 flex flex-col z-20 ${
           showFrame
             ? 'max-w-[450px] h-[92vh] max-h-[860px] bg-white/10 backdrop-blur-2xl rounded-[40px] border border-white/20 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.7)] relative overflow-hidden'
-            : 'max-w-[450px] h-[100dvh] sm:h-auto sm:min-h-[760px] sm:max-h-[92vh] bg-slate-950 sm:bg-white/10 backdrop-blur-2xl sm:rounded-[40px] sm:border sm:border-white/20 shadow-2xl relative overflow-hidden'
+            : 'max-w-[450px] md:max-w-xl h-[100dvh] sm:h-auto sm:min-h-[720px] sm:max-h-[92vh] bg-slate-950 sm:bg-white/10 backdrop-blur-2xl sm:rounded-[40px] sm:border sm:border-white/20 shadow-2xl relative overflow-hidden'
         }`}
       >
         {/* Phone Notch/Speaker simulation */}
