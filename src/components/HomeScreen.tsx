@@ -102,7 +102,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
             Desafio Matemático
           </p>
           <h1 className="text-2xl sm:text-3xl font-extrabold font-display tracking-tight text-white mb-1">
-            MathMaster
+            Matemática Básica
           </h1>
           <p className="text-xs text-white/60 max-w-xs mx-auto">
             Resolva equações de soma, subtração, multiplicação, divisão, raiz e potência!
