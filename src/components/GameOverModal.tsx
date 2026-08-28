@@ -1,5 +1,5 @@
-import React from 'react';
-import { Trophy, Flame, RotateCcw, Award, CheckCircle, XCircle, Home, ListOrdered } from 'lucide-react';
+import React, { useState, useRef } from 'react';
+import { Trophy, Flame, RotateCcw, Award, CheckCircle, XCircle, Home, ListOrdered, ArrowDown, ArrowUp } from 'lucide-react';
 import { motion } from 'motion/react';
 import { SolvedRecord } from '../types';
 
@@ -22,9 +22,28 @@ export const GameOverModal: React.FC<GameOverModalProps> = ({
   onRestart,
   onHome,
 }) => {
+  const [filter, setFilter] = useState<'all' | 'wrong' | 'correct'>('all');
+  const listRef = useRef<HTMLDivElement>(null);
+
   const total = history.length;
   const correctCount = history.filter((h) => h.isCorrect).length;
+  const wrongCount = total - correctCount;
   const accuracy = total > 0 ? Math.round((correctCount / total) * 100) : 0;
+
+  const filteredHistory = history.map((rec, originalIdx) => ({ rec, originalIdx })).filter(({ rec }) => {
+    if (filter === 'wrong') return !rec.isCorrect;
+    if (filter === 'correct') return rec.isCorrect;
+    return true;
+  });
+
+  const scrollList = (direction: 'up' | 'down') => {
+    if (listRef.current) {
+      listRef.current.scrollBy({
+        top: direction === 'down' ? 120 : -120,
+        behavior: 'smooth',
+      });
+    }
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md">
@@ -74,7 +93,7 @@ export const GameOverModal: React.FC<GameOverModalProps> = ({
         </div>
 
         {/* Extra info: Max Streak */}
-        <div className="flex items-center justify-between px-3.5 py-2 bg-black/30 backdrop-blur-md rounded-2xl border border-white/10 mb-3 text-xs shrink-0">
+        <div className="flex items-center justify-between px-3.5 py-2 bg-black/30 backdrop-blur-md rounded-2xl border border-white/10 mb-2.5 text-xs shrink-0">
           <div className="flex items-center gap-2 text-white/80">
             <Flame className="w-4 h-4 text-amber-400" />
             <span>Maior Sequência (Combo):</span>
@@ -82,61 +101,130 @@ export const GameOverModal: React.FC<GameOverModalProps> = ({
           <span className="font-math font-bold text-amber-400 text-sm">{maxStreak} seguidos</span>
         </div>
 
-        {/* Full Equation History List */}
-        <div className="flex-1 min-h-[140px] max-h-[260px] overflow-y-auto mb-3 border border-white/10 rounded-2xl p-2.5 bg-black/30 backdrop-blur-md flex flex-col">
-          <div className="flex items-center justify-between px-1 pb-2 border-b border-white/10 mb-2 shrink-0">
-            <span className="inline-flex items-center gap-1.5 text-xs font-bold text-white/90">
+        {/* Full Equation History List with visible side scrollbar and controls */}
+        <div className="flex-1 min-h-[150px] max-h-[260px] border border-white/15 rounded-2xl p-2.5 bg-black/40 backdrop-blur-md flex flex-col overflow-hidden mb-3">
+          {/* Header with Title and Filter Tabs */}
+          <div className="flex items-center justify-between gap-1 pb-2 border-b border-white/10 mb-2 shrink-0">
+            <span className="inline-flex items-center gap-1.5 text-xs font-bold text-white/90 shrink-0">
               <ListOrdered className="w-3.5 h-3.5 text-emerald-400" />
-              Equações da Partida ({history.length})
+              Equações ({history.length})
             </span>
-            <span className="text-[11px] text-white/50">
-              {correctCount} certas / {total - correctCount} erradas
-            </span>
-          </div>
 
-          {history.length > 0 ? (
-            <div className="space-y-2 overflow-y-auto pr-1">
-              {history.map((record, index) => (
-                <div
-                  key={record.id || index}
-                  className={`p-2.5 rounded-xl border text-xs backdrop-blur-md transition-all ${
-                    record.isCorrect
-                      ? 'bg-emerald-500/10 border-emerald-400/30 text-emerald-200'
-                      : 'bg-rose-500/10 border-rose-400/30 text-rose-200'
+            {/* Quick Filter Buttons */}
+            {history.length > 0 && (
+              <div className="flex items-center gap-1 text-[10px]">
+                <button
+                  type="button"
+                  onClick={() => setFilter('all')}
+                  className={`px-2 py-0.5 rounded-lg border font-semibold transition-all ${
+                    filter === 'all'
+                      ? 'bg-white/20 border-white/40 text-white'
+                      : 'bg-white/5 border-white/10 text-white/60 hover:text-white'
                   }`}
                 >
-                  <div className="flex items-center justify-between font-math text-sm font-bold mb-1">
-                    <span className="text-white">
-                      <span className="text-white/40 text-xs mr-1.5">#{index + 1}</span>
-                      {record.equation.display}
-                    </span>
-                    <span className="flex items-center gap-1.5 text-xs">
-                      {record.isCorrect ? (
-                        <CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" />
-                      ) : (
-                        <XCircle className="w-4 h-4 text-rose-400 shrink-0" />
-                      )}
-                      <span className="font-sans font-medium">
-                        {record.isCorrect
-                          ? `Resp: ${record.userAnswer}`
-                          : `Sua resp: ${record.userAnswer ?? 'Esgotado'}`}
+                  Todas ({total})
+                </button>
+                {wrongCount > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => setFilter('wrong')}
+                    className={`px-2 py-0.5 rounded-lg border font-semibold transition-all ${
+                      filter === 'wrong'
+                        ? 'bg-rose-500/25 border-rose-400/50 text-rose-300'
+                        : 'bg-white/5 border-white/10 text-rose-300/70 hover:text-rose-200'
+                    }`}
+                  >
+                    Erradas ({wrongCount})
+                  </button>
+                )}
+                {correctCount > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => setFilter('correct')}
+                    className={`px-2 py-0.5 rounded-lg border font-semibold transition-all ${
+                      filter === 'correct'
+                        ? 'bg-emerald-500/25 border-emerald-400/50 text-emerald-300'
+                        : 'bg-white/5 border-white/10 text-emerald-300/70 hover:text-emerald-200'
+                    }`}
+                  >
+                    Certas ({correctCount})
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* Equation Items with styled, permanent custom scrollbar & navigation */}
+          {filteredHistory.length > 0 ? (
+            <div className="relative flex-1 flex overflow-hidden">
+              <div
+                ref={listRef}
+                className="flex-1 space-y-2 overflow-y-auto pr-2 custom-scrollbar max-h-[190px]"
+              >
+                {filteredHistory.map(({ rec, originalIdx }) => (
+                  <div
+                    key={rec.id || originalIdx}
+                    className={`p-2.5 rounded-xl border text-xs backdrop-blur-md transition-all ${
+                      rec.isCorrect
+                        ? 'bg-emerald-500/10 border-emerald-400/30 text-emerald-200'
+                        : 'bg-rose-500/10 border-rose-400/30 text-rose-200'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between font-math text-sm font-bold mb-1">
+                      <span className="text-white">
+                        <span className="text-white/40 text-xs mr-1.5">#{originalIdx + 1}</span>
+                        {rec.equation.display}
                       </span>
-                    </span>
-                  </div>
-                  {!record.isCorrect && (
-                    <div className="text-[11px] text-white/80 pt-1 mt-1 border-t border-rose-400/20">
-                      <span className="font-bold text-amber-300">Resposta correta: {record.equation.answer}</span>
-                      {record.equation.explanation && (
-                        <p className="mt-0.5 text-white/60">{record.equation.explanation}</p>
-                      )}
+                      <span className="flex items-center gap-1.5 text-xs">
+                        {rec.isCorrect ? (
+                          <CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" />
+                        ) : (
+                          <XCircle className="w-4 h-4 text-rose-400 shrink-0" />
+                        )}
+                        <span className="font-sans font-medium">
+                          {rec.isCorrect
+                            ? `Resp: ${rec.userAnswer}`
+                            : `Sua resp: ${rec.userAnswer ?? 'Esgotado'}`}
+                        </span>
+                      </span>
                     </div>
-                  )}
+                    {!rec.isCorrect && (
+                      <div className="text-[11px] text-white/80 pt-1 mt-1 border-t border-rose-400/20">
+                        <span className="font-bold text-amber-300">Resposta correta: {rec.equation.answer}</span>
+                        {rec.equation.explanation && (
+                          <p className="mt-0.5 text-white/60">{rec.equation.explanation}</p>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+
+              {/* Side Scroll Assist Buttons for convenient navigation */}
+              {filteredHistory.length > 2 && (
+                <div className="flex flex-col justify-between pl-1 border-l border-white/10 my-1 py-1">
+                  <button
+                    type="button"
+                    onClick={() => scrollList('up')}
+                    className="p-1 rounded-md bg-white/10 hover:bg-white/20 active:bg-white/30 text-white/70 hover:text-white transition-colors"
+                    title="Rolar para cima"
+                  >
+                    <ArrowUp className="w-3.5 h-3.5" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => scrollList('down')}
+                    className="p-1 rounded-md bg-white/10 hover:bg-white/20 active:bg-white/30 text-white/70 hover:text-white transition-colors"
+                    title="Rolar para baixo"
+                  >
+                    <ArrowDown className="w-3.5 h-3.5" />
+                  </button>
                 </div>
-              ))}
+              )}
             </div>
           ) : (
             <div className="flex-1 flex items-center justify-center text-xs text-white/40">
-              Nenhuma equação registrada nesta partida.
+              Nenhuma equação encontrada neste filtro.
             </div>
           )}
         </div>
