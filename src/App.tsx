@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { AnimatePresence } from 'motion/react';
+import { GraduationCap } from 'lucide-react';
 import {
   Equation,
   GameMode,
@@ -263,15 +264,17 @@ export default function App() {
       const delta = (now - lastTimeRef.current) / 1000;
       lastTimeRef.current = now;
 
-      // Handle per-equation timer
-      setTimeLeft((prev) => {
-        const next = prev - delta;
-        if (next <= 0) {
-          handleTimeout();
-          return 0;
-        }
-        return next;
-      });
+      // Handle per-equation timer (disabled in practice mode)
+      if (gameMode !== 'practice') {
+        setTimeLeft((prev) => {
+          const next = prev - delta;
+          if (next <= 0) {
+            handleTimeout();
+            return 0;
+          }
+          return next;
+        });
+      }
 
       // Handle Time Attack 60s global timer
       if (gameMode === 'time_attack') {
@@ -382,10 +385,10 @@ export default function App() {
       setStreak(newStreak);
       setMaxStreak((prev) => Math.max(prev, newStreak));
 
-      // Calculate score with combo multiplier & time bonus
+      // Calculate score with combo multiplier & time bonus (no time bonus in practice)
       const basePoints = 100 * level;
       const comboMultiplier = Math.min(5, 1 + (newStreak - 1) * 0.25);
-      const timeBonus = Math.floor(timeLeft * 15);
+      const timeBonus = gameMode === 'practice' ? 0 : Math.floor(timeLeft * 15);
       const addedScore = Math.floor(basePoints * comboMultiplier) + timeBonus;
 
       setScore((prev) => prev + addedScore);
@@ -526,13 +529,23 @@ export default function App() {
             </div>
           )}
 
-          {/* Equation Countdown Timer */}
-          <TimerBar
-            timeLeft={timeLeft}
-            totalTime={totalTime}
-            isRunning={!isPaused && !isProcessingAnswer && !isCountdownActive && levelUpNewLevel === null}
-            soundEnabled={settings.soundEnabled}
-          />
+          {/* Equation Countdown Timer (Hidden in Practice Mode) */}
+          {gameMode !== 'practice' ? (
+            <TimerBar
+              timeLeft={timeLeft}
+              totalTime={totalTime}
+              isRunning={!isPaused && !isProcessingAnswer && !isCountdownActive && levelUpNewLevel === null}
+              soundEnabled={settings.soundEnabled}
+            />
+          ) : (
+            <div className="w-full px-5 py-1.5 flex items-center justify-between text-xs text-sky-300/90 bg-sky-500/10 border-b border-sky-400/20 backdrop-blur-md">
+              <span className="flex items-center gap-1.5 font-semibold">
+                <GraduationCap className="w-4 h-4 text-sky-400" />
+                Treino Livre
+              </span>
+              <span className="text-[11px] text-white/60">Sem tempo limite • Pratique no seu ritmo</span>
+            </div>
+          )}
 
           {/* Equation Display (Math formula + user typed result) */}
           <EquationDisplay

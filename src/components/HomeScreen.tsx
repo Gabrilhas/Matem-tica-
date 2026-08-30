@@ -38,7 +38,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
     {
       id: 'practice',
       title: 'Treino Livre',
-      desc: 'Sem perda de vidas, ideal para dominar raiz quadrada e contas.',
+      desc: 'Sem limite de tempo e sem vidas, ideal para dominar raiz quadrada e contas no seu ritmo.',
       icon: <GraduationCap className="w-5 h-5 text-sky-400" />,
     },
   ];
