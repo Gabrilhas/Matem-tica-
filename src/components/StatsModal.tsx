@@ -88,7 +88,7 @@ export const StatsModal: React.FC<StatsModalProps> = ({ stats, onResetStats, onC
               const opStat = stats.operatorStats[op];
               const pct = opStat.total > 0 ? Math.round((opStat.correct / opStat.total) * 100) : 0;
               return (
-                <div key={op} className="space-y-1">
+                <div key={`stat-operator-${op}`} className="space-y-1">
                   <div className="flex justify-between text-xs font-semibold">
                     <span className="text-white/80">{operatorNames[op]}</span>
                     <span className="font-math text-emerald-300">

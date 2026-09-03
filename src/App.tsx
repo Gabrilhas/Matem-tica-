@@ -32,6 +32,7 @@ import { StatsModal } from './components/StatsModal';
 import { PauseModal } from './components/PauseModal';
 import { LevelUpOverlay } from './components/LevelUpOverlay';
 import { CountdownOverlay } from './components/CountdownOverlay';
+import { TimeAttackLevelUpPopup } from './components/TimeAttackLevelUpPopup';
 
 export default function App() {
   // Persistence state
@@ -45,6 +46,7 @@ export default function App() {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isStatsOpen, setIsStatsOpen] = useState(false);
   const [levelUpNewLevel, setLevelUpNewLevel] = useState<number | null>(null);
+  const [timeAttackPopup, setTimeAttackPopup] = useState<{ level: number; secondsGained: number } | null>(null);
   const [isCountdownActive, setIsCountdownActive] = useState(false);
   const [countdownLevel, setCountdownLevel] = useState<number | null>(null);
 
@@ -112,6 +114,7 @@ export default function App() {
 
   // Start new game
   const handleStartGame = (mode: GameMode = gameMode) => {
+    soundManager.unlockAudio();
     setGameMode(mode);
     setLevel(1);
     setXpInLevel(0);
@@ -123,6 +126,7 @@ export default function App() {
     setHistory([]);
     setIsPaused(false);
     setLevelUpNewLevel(null);
+    setTimeAttackPopup(null);
     setGlobalTimeAttackRemaining(60);
 
     setScreen('playing');
@@ -139,6 +143,10 @@ export default function App() {
     setIsCountdownActive(true);
   };
 
+  const handleDismissTimeAttackPopup = useCallback(() => {
+    setTimeAttackPopup(null);
+  }, []);
+
   const handleCountdownComplete = () => {
     setIsCountdownActive(false);
     setCountdownLevel(null);
@@ -153,6 +161,7 @@ export default function App() {
       timerRef.current = null;
     }
 
+    setTimeAttackPopup(null);
     soundManager.playGameOver();
     if (settings.vibrationEnabled) {
       triggerVibration([100, 50, 100]);
@@ -185,7 +194,7 @@ export default function App() {
 
     // Record miss
     const record: SolvedRecord = {
-      id: `rec-${Date.now()}`,
+      id: `rec-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
       equation: currentEquation,
       userAnswer: null,
       isCorrect: false,
@@ -352,7 +361,7 @@ export default function App() {
 
     // Record in session history
     const record: SolvedRecord = {
-      id: `rec-${Date.now()}`,
+      id: `rec-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
       equation: currentEquation,
       userAnswer: numericAnswer,
       isCorrect,
@@ -407,13 +416,33 @@ export default function App() {
         setXpInLevel(0);
         // Level up curve: requires 3, then 4, then 5 hits to advance
         setXpRequired(Math.min(6, 3 + Math.floor(nextLevel / 2)));
-        setLevelUpNewLevel(nextLevel);
 
-        // Heart reward on level up in Classic mode if damaged
-        if (gameMode === 'classic' && lives < maxLives) {
-          setLives((prev) => Math.min(maxLives, prev + 1));
+        if (gameMode === 'time_attack') {
+          const secondsGained = 10;
+          setGlobalTimeAttackRemaining((prev) => prev + secondsGained);
+          setTimeAttackPopup({
+            level: nextLevel,
+            secondsGained,
+          });
+          soundManager.playTimeBonus();
+          if (settings.vibrationEnabled) {
+            triggerVibration([40, 40, 60]);
+          }
+          // Seamlessly advance to the next equation without stopping gameplay!
+          setTimeout(() => {
+            if (screen === 'playing') {
+              spawnEquation(nextLevel);
+            }
+          }, 450);
+        } else {
+          setLevelUpNewLevel(nextLevel);
+
+          // Heart reward on level up in Classic mode if damaged
+          if (gameMode === 'classic' && lives < maxLives) {
+            setLives((prev) => Math.min(maxLives, prev + 1));
+          }
+          // Note: Equation and countdown will spawn when LevelUpOverlay is dismissed
         }
-        // Note: Equation and countdown will spawn when LevelUpOverlay is dismissed
       } else {
         setXpInLevel(nextXp);
         // Next equation after smooth reward animation
@@ -647,23 +676,36 @@ export default function App() {
         {/* Countdown Overlay (3, 2, 1, Calcule!) */}
         {isCountdownActive && (
           <CountdownOverlay
+            key="overlay-countdown"
             level={countdownLevel ?? undefined}
             onComplete={handleCountdownComplete}
             vibrationEnabled={settings.vibrationEnabled}
           />
         )}
 
-        {/* Level Up Celebration Banner */}
+        {/* Level Up Celebration Banner (Classic / Other modes) */}
         {levelUpNewLevel !== null && (
           <LevelUpOverlay
+            key={`overlay-levelup-${levelUpNewLevel}`}
             newLevel={levelUpNewLevel}
             onDismiss={handleDismissLevelUp}
+          />
+        )}
+
+        {/* Time Attack Level Up Floating Toast (Small & Non-intrusive, auto-dismisses in 3s) */}
+        {timeAttackPopup !== null && (
+          <TimeAttackLevelUpPopup
+            key={`toast-timeattack-level-${timeAttackPopup.level}`}
+            level={timeAttackPopup.level}
+            secondsGained={timeAttackPopup.secondsGained}
+            onDismiss={handleDismissTimeAttackPopup}
           />
         )}
 
         {/* Pause Modal */}
         {isPaused && (
           <PauseModal
+            key="modal-pause"
             level={level}
             score={score}
             onResume={() => setIsPaused(false)}
@@ -682,6 +724,7 @@ export default function App() {
         {/* Settings Modal */}
         {isSettingsOpen && (
           <SettingsModal
+            key="modal-settings"
             settings={settings}
             onUpdateSettings={updateSettingsAndSave}
             onClose={() => setIsSettingsOpen(false)}
@@ -691,6 +734,7 @@ export default function App() {
         {/* Stats Modal */}
         {isStatsOpen && (
           <StatsModal
+            key="modal-stats"
             stats={stats}
             onResetStats={() => {
               updateStatsAndSave(() => defaultStats);

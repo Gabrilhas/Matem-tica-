@@ -163,7 +163,7 @@ export const GameOverModal: React.FC<GameOverModalProps> = ({
               >
                 {filteredHistory.map(({ rec, originalIdx }) => (
                   <div
-                    key={rec.id || originalIdx}
+                    key={`history-entry-${originalIdx}-${rec.id}`}
                     className={`p-2.5 rounded-xl border text-xs backdrop-blur-md transition-all ${
                       rec.isCorrect
                         ? 'bg-emerald-500/10 border-emerald-400/30 text-emerald-200'

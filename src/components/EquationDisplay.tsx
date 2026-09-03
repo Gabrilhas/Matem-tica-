@@ -124,9 +124,10 @@ export const EquationDisplay: React.FC<EquationDisplayProps> = ({
         </div>
 
         {/* Feedback Messages */}
-        <AnimatePresence>
+        <AnimatePresence mode="wait">
           {isCorrectFeedback === true && (
             <motion.div
+              key="feedback-message-correct"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
@@ -139,6 +140,7 @@ export const EquationDisplay: React.FC<EquationDisplayProps> = ({
 
           {isCorrectFeedback === false && (
             <motion.div
+              key="feedback-message-incorrect"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}

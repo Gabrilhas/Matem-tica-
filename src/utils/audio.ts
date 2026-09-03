@@ -14,6 +14,13 @@ class SoundManager {
     return this.enabled;
   }
 
+  public unlockAudio() {
+    this.initCtx();
+    if (this.ctx && this.ctx.state === 'suspended') {
+      this.ctx.resume().catch(() => {});
+    }
+  }
+
   private initCtx() {
     if (!this.ctx && typeof window !== 'undefined') {
       const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
@@ -22,7 +29,7 @@ class SoundManager {
       }
     }
     if (this.ctx && this.ctx.state === 'suspended') {
-      this.ctx.resume();
+      this.ctx.resume().catch(() => {});
     }
   }
 
@@ -55,44 +62,82 @@ class SoundManager {
 
   public playCountdownBeep(step: number | 'start') {
     if (!this.enabled) return;
-    this.initCtx();
+    this.unlockAudio();
     if (!this.ctx) return;
 
     try {
       const now = this.ctx.currentTime;
-      const osc = this.ctx.createOscillator();
-      const gain = this.ctx.createGain();
 
       if (step === 'start') {
-        // High energetic start tone
-        osc.type = 'triangle';
-        osc.frequency.setValueAtTime(880, now);
-        osc.frequency.exponentialRampToValueAtTime(1046.5, now + 0.15);
+        // High energetic chord start tone
+        const freqs = [523.25, 659.25, 1046.50]; // C5, E5, C6
+        freqs.forEach((f) => {
+          if (!this.ctx) return;
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(f, now);
+          osc.frequency.exponentialRampToValueAtTime(f * 1.15, now + 0.2);
 
-        gain.gain.setValueAtTime(0.2, now);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+          gain.gain.setValueAtTime(0.18, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.38);
 
-        osc.connect(gain);
-        gain.connect(this.ctx.destination);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
 
-        osc.start(now);
-        osc.stop(now + 0.35);
+          osc.start(now);
+          osc.stop(now + 0.38);
+        });
       } else {
-        // Countdown ticks (3, 2, 1)
-        const freqs: Record<number, number> = { 3: 440, 2: 554.37, 1: 659.25 };
-        const freq = freqs[step] || 520;
+        // Countdown ticks (3, 2, 1) - distinct, crisp arcade tones
+        const freqs: Record<number, number> = { 3: 523.25, 2: 659.25, 1: 783.99 };
+        const freq = freqs[step] || 587.33;
+
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+
         osc.type = 'sine';
         osc.frequency.setValueAtTime(freq, now);
 
-        gain.gain.setValueAtTime(0.18, now);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+        gain.gain.setValueAtTime(0.24, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.16);
 
         osc.connect(gain);
         gain.connect(this.ctx.destination);
 
         osc.start(now);
-        osc.stop(now + 0.12);
+        osc.stop(now + 0.16);
       }
+    } catch {}
+  }
+
+  public playTimeBonus() {
+    if (!this.enabled) return;
+    this.unlockAudio();
+    if (!this.ctx) return;
+
+    try {
+      const now = this.ctx.currentTime;
+      // Cheerful ascending arpeggio for gaining time in Time Attack
+      const notes = [587.33, 739.99, 880.00, 1174.66]; // D5, F#5, A5, D6
+      notes.forEach((freq, idx) => {
+        if (!this.ctx) return;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(freq, now + idx * 0.06);
+
+        gain.gain.setValueAtTime(0.001, now + idx * 0.06);
+        gain.gain.linearRampToValueAtTime(0.22, now + idx * 0.06 + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.06 + 0.28);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+
+        osc.start(now + idx * 0.06);
+        osc.stop(now + idx * 0.06 + 0.28);
+      });
     } catch {}
   }
 

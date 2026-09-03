@@ -52,7 +52,7 @@ export const NumericKeypad: React.FC<NumericKeypadProps> = ({
         {/* Row 1: 1, 2, 3 */}
         {[1, 2, 3].map((num) => (
           <button
-            key={num}
+            key={`keypad-digit-${num}`}
             id={`keypad-digit-${num}`}
             type="button"
             disabled={disabled}
@@ -66,7 +66,7 @@ export const NumericKeypad: React.FC<NumericKeypadProps> = ({
         {/* Row 2: 4, 5, 6 */}
         {[4, 5, 6].map((num) => (
           <button
-            key={num}
+            key={`keypad-digit-${num}`}
             id={`keypad-digit-${num}`}
             type="button"
             disabled={disabled}
@@ -80,7 +80,7 @@ export const NumericKeypad: React.FC<NumericKeypadProps> = ({
         {/* Row 3: 7, 8, 9 */}
         {[7, 8, 9].map((num) => (
           <button
-            key={num}
+            key={`keypad-digit-${num}`}
             id={`keypad-digit-${num}`}
             type="button"
             disabled={disabled}
@@ -93,6 +93,7 @@ export const NumericKeypad: React.FC<NumericKeypadProps> = ({
 
         {/* Row 4: ± / Limpar, 0, Backspace */}
         <button
+          key="keypad-toggle-sign"
           id="keypad-toggle-sign"
           type="button"
           disabled={disabled}
@@ -104,6 +105,7 @@ export const NumericKeypad: React.FC<NumericKeypadProps> = ({
         </button>
 
         <button
+          key="keypad-digit-0"
           id="keypad-digit-0"
           type="button"
           disabled={disabled}
@@ -114,6 +116,7 @@ export const NumericKeypad: React.FC<NumericKeypadProps> = ({
         </button>
 
         <button
+          key="keypad-backspace"
           id="keypad-backspace"
           type="button"
           disabled={disabled}

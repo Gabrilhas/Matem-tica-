@@ -2,6 +2,7 @@ import React from 'react';
 import { Play, Flame, Timer, GraduationCap, Trophy, Settings, BarChart2, Check, Sparkles } from 'lucide-react';
 import { motion } from 'motion/react';
 import { GameMode, Operator, UserStats } from '../types';
+import { soundManager } from '../utils/audio';
 
 interface HomeScreenProps {
   stats: UserStats;
@@ -174,7 +175,10 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
         <button
           id="btn-start-game"
           type="button"
-          onClick={onStartGame}
+          onClick={() => {
+            soundManager.unlockAudio();
+            onStartGame();
+          }}
           className="w-full flex items-center justify-center gap-2 py-3.5 px-6 rounded-2xl bg-emerald-400 hover:bg-emerald-300 text-slate-950 font-extrabold text-base shadow-[0_0_25px_rgba(52,211,153,0.4)] hover:shadow-[0_0_35px_rgba(52,211,153,0.6)] active:scale-95 transition-all cursor-pointer"
         >
           <Play className="w-5 h-5 fill-slate-950" />

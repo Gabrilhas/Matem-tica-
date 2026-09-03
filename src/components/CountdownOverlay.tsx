@@ -17,6 +17,7 @@ export const CountdownOverlay: React.FC<CountdownOverlayProps> = ({
   const [step, setStep] = useState<3 | 2 | 1 | 'go'>(3);
 
   useEffect(() => {
+    soundManager.unlockAudio();
     // Step 3
     soundManager.playCountdownBeep(3);
     if (vibrationEnabled) triggerVibration(30);
